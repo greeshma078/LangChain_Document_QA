@@ -1,0 +1,30 @@
+ABC Technologies
+
+ABC Technologies is a software company founded in 2015.
+
+The company provides services in Artificial Intelligence, Data Science,
+Cloud Computing, and Software Development.
+
+The company headquarters is located in Bengaluru, India.
+
+ABC Technologies has approximately 500 employees.
+
+The company offers three main products:
+
+1. AI Analytics Platform
+2. Cloud Management System
+3. Customer Support Automation Platform
+
+The AI Analytics Platform helps businesses analyze large amounts of data
+and generate useful business insights.
+
+The Cloud Management System helps organizations monitor and manage
+their cloud infrastructure.
+
+The Customer Support Automation Platform uses artificial intelligence
+to automate customer queries and support operations.
+
+The company provides training programs for fresh graduates in Python,
+SQL, Data Science, and Artificial Intelligence.
+
+The company's working hours are from 9:00 AM to 6:00 PM, Monday to Friday.
