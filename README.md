@@ -1,442 +1,798 @@
 # 📚 LangChain Document Q&A using RAG
 
-A Generative AI application that allows users to ask questions about a document and receive answers using **Retrieval-Augmented Generation (RAG)**.
+A Generative AI application that allows users to upload a document and ask questions about its content.
 
-This project combines **LangChain, ChromaDB, Sentence Transformers, Ollama, Llama 3.2, and Streamlit** to build a local document question-answering system.
-
-The application retrieves relevant information from the document before generating an answer, allowing the LLM to answer questions based on the provided knowledge source.
+The project uses **LangChain**, **Retrieval-Augmented Generation (RAG)**, **Sentence Transformers**, **ChromaDB**, and **Ollama** to retrieve relevant information from the document and generate context-aware answers using a locally running Large Language Model.
 
 ---
 
-## 🚀 Project Overview
+## 📌 Project Overview
 
-Large Language Models can generate useful answers, but they may not know information contained in private or custom documents.
+Traditional Large Language Models may not know the information contained in a user's private or newly uploaded documents.
 
-This project solves that problem using **Retrieval-Augmented Generation (RAG)**.
+This project solves that problem using a **Retrieval-Augmented Generation (RAG)** pipeline.
 
-The document goes through the following process:
+The application:
 
-1. Document Loading
-2. Text Splitting
-3. Text Embedding
-4. Vector Storage
-5. Semantic Retrieval
-6. Context Creation
-7. Prompt Construction
-8. LLM Generation
-9. Final Answer
+1. Accepts a document from the user.
+2. Extracts the document text.
+3. Splits the text into smaller chunks.
+4. Converts the chunks into vector embeddings.
+5. Stores the embeddings in a vector database.
+6. Searches for relevant chunks when a question is asked.
+7. Sends the retrieved context to a local LLM.
+8. Generates an answer based on the retrieved document content.
 
-### RAG Workflow
+---
+
+## 🎯 Objectives
+
+- Build a practical Generative AI application using LangChain.
+- Understand the Retrieval-Augmented Generation architecture.
+- Process and retrieve information from documents.
+- Generate semantic embeddings using Sentence Transformers.
+- Store and search document embeddings using ChromaDB.
+- Use a locally running LLM through Ollama.
+- Build an interactive user interface using Streamlit.
+- Create a complete end-to-end RAG application.
+
+---
+
+## 🧠 What is RAG?
+
+**RAG (Retrieval-Augmented Generation)** is a technique that combines information retrieval with Large Language Models.
+
+Instead of asking the LLM to answer a question only from its pretrained knowledge, the application first retrieves relevant information from the user's document.
+
+The retrieved information is then provided to the LLM as context.
+
+### RAG Process
 
 ```text
 Document
-    ↓
-Document Loading
-    ↓
+   ↓
+Text Extraction
+   ↓
 Text Splitting
-    ↓
+   ↓
+Text Chunks
+   ↓
 Embeddings
-    ↓
-ChromaDB Vector Store
-    ↓
-User Question
-    ↓
-Question Embedding
-    ↓
-Similarity Search
-    ↓
-Relevant Document Chunks
-    ↓
-LangChain Prompt
-    ↓
-Llama 3.2
-    ↓
-Generated Answer
-🧠 Technologies Used
-Technology	Purpose
-Python	Programming language
-LangChain	Framework for building LLM applications
-RAG	Retrieval-Augmented Generation architecture
-Sentence Transformers	Text embedding generation
-all-MiniLM-L6-v2	Embedding model
-ChromaDB	Vector database
-Ollama	Local LLM runtime
-Llama 3.2	Local language model
-Streamlit	Web application interface
-PyPDF	PDF document processing
-📂 Project Structure
-LangChain_Document_QA/
-│
-├── data/
-│   └── company_info.txt
-│
-├── src/
-│   ├── __init__.py
-│   ├── document_loader.py
-│   ├── text_splitter.py
-│   ├── embeddings.py
-│   ├── vector_store.py
-│   ├── retriever.py
-│   ├── llm_test.py
-│   └── rag_pipeline.py
-│
-├── app.py
-├── requirements.txt
-├── .gitignore
-└── README.md
-📄 Knowledge Source
-
-The project currently uses a sample company document:
-
-data/company_info.txt
-
-The document contains information about ABC Technologies, including:
-
-Company background
-Services
-Headquarters
-Number of employees
-Products
-Training programs
-Working hours
-
-Example:
-
-ABC Technologies is a software company founded in 2015.
-
-The company headquarters is located in Bengaluru, India.
-
-The company provides services in Artificial Intelligence,
-Data Science, Cloud Computing, and Software Development.
-🔄 RAG Pipeline
-1. Document Loading
-
-The document is loaded from the data directory.
-
-File:
-
-src/document_loader.py
-
-The document text is read and passed to the next stage of the pipeline.
-
-2. Text Splitting
-
-Large documents are divided into smaller chunks using LangChain's:
-
-RecursiveCharacterTextSplitter
-
-Configuration:
-
-chunk_size=300
-chunk_overlap=50
-
-Text splitting allows the retrieval system to work with smaller and more meaningful sections of the document.
-
-3. Text Embeddings
-
-Each document chunk is converted into a numerical vector using:
-
-all-MiniLM-L6-v2
-
-The embedding model generates:
-
-384-dimensional embeddings
-
-These embeddings represent the semantic meaning of the text.
-
-4. Vector Database
-
-The generated embeddings and document chunks are stored in:
-
+   ↓
 ChromaDB
+   ↓
+User Question
+   ↓
+Similarity Search
+   ↓
+Relevant Document Chunks
+   ↓
+LLM
+   ↓
+Generated Answer
+```
 
-ChromaDB allows the application to efficiently perform semantic similarity searches.
+---
 
-The local vector database is stored in:
+## 🔄 RAG Workflow
 
-chroma_db/
+### Step 1: Document Upload
 
-The chroma_db/ directory is excluded from GitHub using .gitignore.
+The user uploads a supported document through the Streamlit interface.
 
-5. Semantic Retrieval
+```text
+User
+ ↓
+Upload Document
+```
 
-When the user asks a question, the question is converted into an embedding using the same embedding model.
+---
 
-The application searches ChromaDB for the most relevant document chunks.
+### Step 2: Document Loading
 
-For example:
+The application reads the uploaded document and extracts its text.
 
-Question:
-Where is ABC Technologies headquartered?
+```text
+Document
+   ↓
+Document Loader
+   ↓
+Extracted Text
+```
 
-The retrieval system finds the relevant information:
+---
 
-The company headquarters is located in Bengaluru, India.
-6. Prompt Construction
+### Step 3: Text Splitting
 
-The retrieved document chunks are inserted into a prompt.
+Large documents are divided into smaller chunks.
 
-The prompt instructs the LLM to answer the user's question using only the retrieved context.
+This makes it easier to search for relevant information.
 
-If the required information is not available in the document, the system is instructed to respond:
+```text
+Large Document
+      ↓
+Text Splitter
+      ↓
+Chunk 1
+Chunk 2
+Chunk 3
+...
+Chunk N
+```
 
-I don't know based on the provided document.
+---
 
-This helps reduce unsupported answers from the LLM.
+### Step 4: Embedding Generation
 
-7. Local LLM
+Each document chunk is converted into a numerical vector using the Sentence Transformers model.
 
 The project uses:
 
-Llama 3.2
+```text
+all-MiniLM-L6-v2
+```
 
-as the language model.
+These vectors represent the semantic meaning of the text.
 
-Llama 3.2 runs locally using:
+```text
+Text Chunk
+    ↓
+Sentence Transformer
+    ↓
+Vector Embedding
+```
 
-Ollama
+---
 
-LangChain communicates with Ollama through:
+### Step 5: Vector Database
 
-ChatOllama
+The generated embeddings are stored in **ChromaDB**.
 
-No paid cloud LLM API is required for this project.
+ChromaDB allows the application to efficiently search for document chunks that are semantically similar to the user's question.
 
-💻 Streamlit Application
+```text
+Document Chunks
+      ↓
+Embeddings
+      ↓
+ChromaDB
+```
 
-The project includes a Streamlit web interface where users can enter questions about the document.
+---
 
-Run the application using:
+### Step 6: User Question
 
-streamlit run app.py
+The user enters a question related to the uploaded document.
 
-The application provides:
+Example:
 
-Question input
-RAG-based answer generation
-Loading indicator
-Retrieved document context
-Interactive question answering
-🧪 Example Questions
-Question 1
-Where is ABC Technologies headquartered?
-Answer
-ABC Technologies is headquartered in Bengaluru, India.
-Question 2
-What products does ABC Technologies offer?
-Answer
+```text
+What are the main objectives mentioned in the document?
+```
 
-The company offers:
+---
 
-AI Analytics Platform
-Cloud Management System
-Customer Support Automation Platform
-Question 3
-What are the working hours of ABC Technologies?
-Answer
-The working hours are from 9:00 AM to 6:00 PM, Monday to Friday.
-Question 4
-What programming languages are included in the training programs?
-Answer
+### Step 7: Similarity Search
 
-The training programs include:
+The user's question is converted into an embedding.
 
-Python
-SQL
-Data Science
-Artificial Intelligence
-🛠️ Installation
-1. Clone the Repository
-git clone https://github.com/greeshma078/LangChain_Document_QA.git
+ChromaDB compares the question embedding with the stored document embeddings and retrieves the most relevant chunks.
 
-Move into the project directory:
+```text
+User Question
+      ↓
+Question Embedding
+      ↓
+Similarity Search
+      ↓
+Relevant Chunks
+```
 
+---
+
+### Step 8: Context + Question
+
+The retrieved document chunks are combined with the user's question and passed to the LLM.
+
+```text
+Relevant Context
+       +
+User Question
+       ↓
+      LLM
+```
+
+---
+
+### Step 9: Answer Generation
+
+The LLM generates a response using the retrieved document context.
+
+```text
+Retrieved Context
+       ↓
+Ollama LLM
+       ↓
+Generated Answer
+```
+
+---
+
+## 🏗️ Project Architecture
+
+```text
+                    ┌──────────────────┐
+                    │  User Uploads    │
+                    │    Document      │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ Document Loader   │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │  Text Splitter   │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │   Embeddings     │
+                    │ all-MiniLM-L6-v2 │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │    ChromaDB      │
+                    │ Vector Database  │
+                    └────────┬─────────┘
+                             │
+                             │
+User Question ───────────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ Similarity Search│
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ Relevant Context │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │      Ollama      │
+                    │     Local LLM    │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │ Generated Answer │
+                    └──────────────────┘
+```
+
+---
+
+## 🛠️ Technologies Used
+
+| Technology | Purpose |
+|---|---|
+| Python | Programming language |
+| LangChain | Framework for building LLM and RAG applications |
+| RAG | Retrieval-Augmented Generation architecture |
+| Sentence Transformers | Generates semantic text embeddings |
+| all-MiniLM-L6-v2 | Embedding model |
+| ChromaDB | Vector database for storing and retrieving embeddings |
+| Ollama | Runs the LLM locally |
+| Streamlit | Web application interface |
+
+---
+
+## 📁 Project Structure
+
+```text
+LangChain_Document_QA/
+│
+├── app.py
+│
+├── requirements.txt
+│
+├── README.md
+│
+├── data/
+│   └── sample_document.pdf
+│
+└── chroma_db/
+    └── Vector database files
+```
+
+### File Description
+
+| File / Folder | Description |
+|---|---|
+| `app.py` | Main Streamlit application |
+| `requirements.txt` | Python dependencies |
+| `README.md` | Project documentation |
+| `data/` | Stores sample or input documents |
+| `chroma_db/` | Stores the generated ChromaDB vector database |
+
+---
+
+## ⚙️ How the Application Works
+
+The application follows this pipeline:
+
+```text
+Upload Document
+      ↓
+Extract Text
+      ↓
+Split Text into Chunks
+      ↓
+Generate Embeddings
+      ↓
+Store in ChromaDB
+      ↓
+Enter Question
+      ↓
+Generate Question Embedding
+      ↓
+Retrieve Relevant Chunks
+      ↓
+Send Context + Question to Ollama
+      ↓
+Generate Answer
+      ↓
+Display Answer in Streamlit
+```
+
+---
+
+## 🧩 Key Components
+
+### 1. LangChain
+
+LangChain is used to connect different components of the RAG pipeline.
+
+It helps manage:
+
+- Document loading
+- Text splitting
+- Embeddings
+- Vector stores
+- Retrievers
+- LLM interaction
+- Prompt construction
+
+---
+
+### 2. Sentence Transformers
+
+Sentence Transformers converts text into numerical vector representations.
+
+The project uses:
+
+```text
+all-MiniLM-L6-v2
+```
+
+This allows the application to compare the semantic similarity between the user's question and document chunks.
+
+---
+
+### 3. ChromaDB
+
+ChromaDB is used as the vector database.
+
+It stores:
+
+```text
+Document Chunk
+     +
+Embedding
+     +
+Metadata
+```
+
+When the user asks a question, ChromaDB retrieves the most relevant document chunks.
+
+---
+
+### 4. Ollama
+
+Ollama is used to run a Large Language Model locally.
+
+The LLM receives:
+
+```text
+Retrieved Context
++
+User Question
+```
+
+and generates the final answer.
+
+Running the model locally helps keep document content within the local environment rather than sending it to a paid external LLM API.
+
+---
+
+### 5. Streamlit
+
+Streamlit provides the user interface.
+
+The application allows the user to:
+
+- Upload a document
+- Enter a question
+- Submit the question
+- View the generated answer
+
+---
+
+## 🖥️ Application Interface
+
+The application contains a simple interface with:
+
+```text
+-----------------------------------------
+       📚 Document Q&A using RAG
+-----------------------------------------
+
+Upload your document
+
+[ Choose a file ]
+
+Ask a question about the document
+
+[ Enter your question here ]
+
+[ Ask Question ]
+
+-----------------------------------------
+
+Answer:
+Generated answer from the document
+-----------------------------------------
+```
+
+---
+
+## 📦 Installation
+
+### Step 1: Clone the Repository
+
+```bash
+git clone <your-github-repository-url>
+```
+
+Navigate to the project directory:
+
+```bash
 cd LangChain_Document_QA
-2. Install Python Dependencies
+```
 
-Install the required packages:
+---
 
+### Step 2: Create a Virtual Environment
+
+Create a Python virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate the environment on Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+---
+
+### Step 3: Install Dependencies
+
+Install the required Python packages:
+
+```bash
 pip install -r requirements.txt
-🦙 Ollama Setup
+```
 
-This project uses Ollama to run the Llama 3.2 model locally.
+---
 
-Install Ollama from:
+## 🦙 Ollama Setup
 
-https://ollama.com/
+Install Ollama on your system and make sure the Ollama service is running.
 
-After installing Ollama, download the Llama 3.2 model:
+After installation, verify that Ollama is available:
 
+```bash
+ollama --version
+```
+
+Download the LLM model used by the project.
+
+For example:
+
+```bash
 ollama pull llama3.2
+```
 
-Verify that the model is installed:
+Verify the installed models:
 
+```bash
 ollama list
+```
 
-You should see:
+The exact model can be changed depending on the model available in your local Ollama installation.
 
-llama3.2:latest
-▶️ Running the Project
-Test the LLM
+---
 
-Run:
+## ▶️ Running the Application
 
-python src/llm_test.py
+Start the Streamlit application using:
 
-This verifies the connection between:
+```bash
+streamlit run app.py
+```
 
-Python
-   ↓
-LangChain
-   ↓
-ChatOllama
-   ↓
-Ollama
-   ↓
-Llama 3.2
-Test the RAG Pipeline
+The application will open in the browser.
 
-Run:
+If it does not open automatically, Streamlit will display a local URL such as:
 
-python src/rag_pipeline.py
+```text
+http://localhost:8501
+```
 
-This tests the complete RAG workflow:
+Open the URL in your browser.
 
+---
+
+## 📝 Example Usage
+
+### Step 1
+
+Upload a document.
+
+Example:
+
+```text
+sample_document.pdf
+```
+
+### Step 2
+
+Enter a question.
+
+Example:
+
+```text
+What is the main topic of this document?
+```
+
+### Step 3
+
+Click:
+
+```text
+Ask Question
+```
+
+### Step 4
+
+The application retrieves relevant information from the document and generates an answer using the local LLM.
+
+---
+
+## 💡 Example
+
+### User Question
+
+```text
+What are the main objectives mentioned in the document?
+```
+
+### RAG Process
+
+```text
 Question
    ↓
 Question Embedding
    ↓
-ChromaDB Retrieval
+ChromaDB Similarity Search
    ↓
-Relevant Context
+Relevant Document Chunks
    ↓
-LangChain Prompt
-   ↓
-Llama 3.2
+Ollama
    ↓
 Answer
-Run the Streamlit Application
+```
 
-Run:
+### Generated Answer
 
-streamlit run app.py
+```text
+The main objectives mentioned in the document are to
+improve efficiency, automate processes, and provide
+better decision-making support.
+```
 
-The Streamlit application will open in your browser.
+The actual answer depends on the uploaded document.
 
-🧩 Project Components
-document_loader.py
+---
 
-Loads the document from the data directory.
+## 🔍 Why Use RAG?
 
-text_splitter.py
+A normal LLM application may generate an answer based on its pretrained knowledge.
 
-Splits the document into smaller chunks using LangChain's RecursiveCharacterTextSplitter.
+RAG adds external knowledge from a specific document.
 
-embeddings.py
+### Without RAG
 
-Creates numerical embeddings for the document chunks using Sentence Transformers.
+```text
+User Question
+      ↓
+     LLM
+      ↓
+General Answer
+```
 
-vector_store.py
+### With RAG
 
-Creates and stores document embeddings in ChromaDB.
+```text
+User Question
+      ↓
+Retrieve Relevant Information
+      ↓
+Document Context
+      ↓
+     LLM
+      ↓
+Context-Aware Answer
+```
 
-retriever.py
+This makes RAG useful for applications involving:
 
-Performs semantic similarity search and retrieves the most relevant document chunks for a user question.
+- Documents
+- Reports
+- Manuals
+- Research papers
+- Company documents
+- Educational materials
+- Knowledge bases
 
-llm_test.py
+---
 
-Tests the local Llama 3.2 model through LangChain and Ollama.
+## 🔐 Advantages
 
-rag_pipeline.py
+- Uses document-specific information.
+- Can work with private documents locally.
+- Reduces dependence on the LLM's pretrained knowledge.
+- Supports semantic document search.
+- Uses a local LLM through Ollama.
+- Avoids requiring a paid cloud LLM API for generation.
+- Provides an interactive Streamlit interface.
+- Demonstrates a complete Generative AI workflow.
 
-Combines:
+---
 
-Document retrieval
-Context creation
-LangChain prompt construction
-Llama 3.2 response generation
+## ⚠️ Limitations
 
-to create the complete RAG pipeline.
+- Answer quality depends on the quality of the document.
+- Incorrect or incomplete document extraction can affect results.
+- Retrieval quality depends on chunking and embedding quality.
+- Local LLM performance depends on available system resources.
+- Very large documents may require additional optimization.
+- The application may not answer questions that are not supported by the uploaded document.
 
-app.py
+---
 
-Provides the Streamlit user interface for interacting with the RAG application.
+## 🚀 Future Improvements
 
-🔐 Local Processing
+Possible future improvements include:
 
-One of the key features of this project is local LLM processing.
+- Support for multiple documents.
+- Support for DOCX, TXT, and other document formats.
+- Conversation history.
+- Chat memory.
+- Source document references.
+- Displaying retrieved document chunks.
+- Improved prompt engineering.
+- Advanced retrieval strategies.
+- Hybrid search.
+- Reranking retrieved documents.
+- Streaming LLM responses.
+- Better document processing.
+- Deployment to a cloud platform.
 
-The application uses:
+---
 
-Ollama + Llama 3.2
+## 📚 Learning Outcomes
 
-instead of requiring a paid external LLM API.
+Through this project, the following concepts were implemented and practiced:
 
-The document retrieval and LLM generation can therefore be performed locally on the user's computer.
+- Generative AI
+- Large Language Models
+- Retrieval-Augmented Generation
+- LangChain
+- Document processing
+- Text chunking
+- Semantic search
+- Vector embeddings
+- Sentence Transformers
+- ChromaDB
+- Vector databases
+- Local LLMs
+- Ollama
+- Prompt construction
+- Streamlit
+- End-to-end AI application development
 
-🎯 Learning Objectives
+---
 
-This project demonstrates practical knowledge of:
+## 🎓 Project Type
 
+```text
 Generative AI
+        +
+Natural Language Processing
+        +
 Retrieval-Augmented Generation
-LangChain
+        +
 Large Language Models
-Prompt Engineering
-Text Embeddings
-Semantic Search
-Vector Databases
-ChromaDB
+        +
+Vector Database
+```
+
+---
+
+## 📌 Conclusion
+
+This project demonstrates how a **Retrieval-Augmented Generation system** can be built using LangChain to answer questions from user-provided documents.
+
+The system combines:
+
+```text
+LangChain
+   +
 Sentence Transformers
+   +
+ChromaDB
+   +
 Ollama
-Llama 3.2
+   +
 Streamlit
-Document Question Answering
-Local LLM Applications
-🔮 Future Improvements
+```
 
-Possible improvements for future versions include:
+to create an end-to-end document question-answering application.
 
-PDF document support
-Multiple document support
-File upload functionality
-Chat history
-Conversation memory
-Source citations
-Metadata filtering
-Improved chunking strategies
-Multiple embedding models
-Support for additional local LLMs
-Document management
-Cloud deployment
-👩‍💻 Author
+The project provides practical experience with modern Generative AI concepts including **RAG, embeddings, vector databases, semantic search, and local Large Language Models**.
 
-Greeshma Reddy
+---
 
-B.Tech – Artificial Intelligence & Data Science
+## 👩‍💻 Author
 
-GitHub:
+**Greeshma**
 
-https://github.com/greeshma078
+B.Tech – Artificial Intelligence and Data Science
 
-⭐ Project Highlights
-✔ Generative AI
-✔ LangChain
-✔ Retrieval-Augmented Generation (RAG)
-✔ ChromaDB
-✔ Sentence Transformers
-✔ Semantic Search
-✔ Ollama
-✔ Llama 3.2
-✔ Streamlit
-✔ Local LLM
-✔ Document Question Answering
-✔ Prompt Engineering
-📌 Summary
+---
 
-This project demonstrates an end-to-end Generative AI and RAG workflow.
+## ⭐ Project Highlights
 
-A document is loaded and divided into chunks, converted into embeddings, and stored in ChromaDB. When a user asks a question, the system retrieves the most relevant document chunks and provides them as context to Llama 3.2 through LangChain.
+```text
+📄 Document Processing
+🧠 Semantic Embeddings
+🔎 Similarity Search
+🗄️ ChromaDB Vector Store
+🔗 LangChain RAG Pipeline
+🦙 Local LLM with Ollama
+💬 Document Question Answering
+🖥️ Streamlit Interface
+```
 
-The final answer is generated using the retrieved information, creating a local Document Question Answering system powered by LangChain, RAG, ChromaDB, Ollama, Llama 3.2, and Streamlit.
+---
+
+## 📜 License
+
+This project is created for educational and portfolio purposes.
